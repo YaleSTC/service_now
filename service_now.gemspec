@@ -6,12 +6,14 @@ require 'service_now/version'
 Gem::Specification.new do |spec|
   spec.name          = "service_now"
   spec.version       = ServiceNow::VERSION
-  spec.authors       = ["hengchu"]
-  spec.email         = ["hengchu.zhang@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.authors       = ["YaleSTC::hengchu zhang"]
+  spec.email         = ["hengchu.zhang@yale.edu"]
+  spec.description   = %q{Ruby wrapper for SN API requests}
+  spec.summary       = %q{Ruby wrapper for SN API requests}
   spec.homepage      = ""
   spec.license       = "MIT"
+
+  spec.add_dependency('rest-client')
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

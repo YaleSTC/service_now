@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ServiceNow
 
 TODO: Write a gem description
@@ -27,3 +28,9 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+=======
+service_now
+===========
+
+A gem to interface with Service Now
+>>>>>>> cf524d327f9859d8ae7a133cfad23178f94a8a5e
