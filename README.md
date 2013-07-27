@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ServiceNow
 
 TODO: Write a gem description
@@ -33,4 +32,3 @@ service_now
 ===========
 
 A gem to interface with Service Now
->>>>>>> cf524d327f9859d8ae7a133cfad23178f94a8a5e
