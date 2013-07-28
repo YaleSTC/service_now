@@ -41,9 +41,9 @@ module ServiceNow
 
     class Incident
 
-        def initialize(attributes = {})
+        def initialize(attributes = {}, saved_on_sn = false)
             @attributes = attributes
-            @saved_on_sn = false
+            @saved_on_sn = saved_on_sn
         end
  
         def attributes
@@ -54,9 +54,9 @@ module ServiceNow
             method_name = method.to_s
             if match = method_name.match(/(.*)=/) # writer method
                 attribute = match[1]
-                @attributes[attribute] = args
+                @attributes[attribute.to_sym] = args
             else # reader method
-                @attributes[method_name]
+                @attributes[method_name.to_sym]
             end
         end
 
@@ -67,6 +67,8 @@ module ServiceNow
                 @saved_on_sn = true
             else
                 response = Configuration.update_resource(self.number).post(self.attributes.to_json)
+                # debug
+                puts response
                 # even though we know it's saved already, just set it again to be sure
                 @saved_on_sn = true
             end
@@ -94,7 +96,7 @@ module ServiceNow
             hash = JSON.parse(response, { :symbolize_names => true })
             inc_obj = hash[:records][0]
             # return the Incident object
-            inc_obj = Incident.new(inc_obj)
+            inc_obj = Incident.new(attributes = inc_obj, saved_on_sn = true)
             if inc_obj.attributes.nil?
                 "SN::No incident with incident number #{query_hash[:number]} found"
             else
