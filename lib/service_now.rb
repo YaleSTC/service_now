@@ -1,6 +1,7 @@
 require "service_now/version"
 require "rest_client"
 require "json"
+require "uri"
 
 module ServiceNow
     $root_url = nil
@@ -18,7 +19,7 @@ module ServiceNow
 
         def self.get_resource(query_hash = {})
             # to be filled in
-            RestClient::Resource.new($root_url + "/incident.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}", $username, $password)
+            RestClient::Resource.new(URI.escape($root_url + "/incident.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}"), $username, $password)
         end
 
         def self.post_resource
@@ -102,6 +103,17 @@ module ServiceNow
             else
                 inc_obj
             end
+        end
+
+        def self.where(query_hash = {})
+            response = Configuration.get_resource(query_hash).get();
+            hash = JSON.parse(response, { :symbolize_names => true })
+            array_of_records = hash[:records]
+            array_of_inc = []
+            array_of_records.each do |record|
+                array_of_inc << Incident.new(attributes = record, saved_on_sn = true)
+            end
+            array_of_inc
         end
     end
 end
