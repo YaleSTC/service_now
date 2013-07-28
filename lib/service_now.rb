@@ -18,6 +18,7 @@ module ServiceNow
 
         def self.get_resource(query_hash = {})
             # to be filled in
+            RestClient::Resource.new($root_url + "/incident.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}", $username, $password)
         end
 
         def self.post_resource
@@ -27,6 +28,15 @@ module ServiceNow
         def self.update_resource(incident_number)
            RestClient::Resource.new($root_url + "/incident.do?JSON&sysparm_query=number=#{incident_number}&sysparm_action=update", $username, $password) 
         end
+
+        private
+            def self.hash_to_query(query_hash = {})
+                query_string = []
+                query_hash.each do |k, v|
+                    query_string << k.to_s + "=" + v.to_s
+                end
+                query_string.join('^')
+            end
     end
 
     class Incident
@@ -70,6 +80,26 @@ module ServiceNow
                 eval("self.#{key_name} = value")
             end
             return self
+        end
+
+        def self.find(inc_number)
+            inc_string = inc_number.to_s.match(/[123456789]+\d*$/).to_s
+            if inc_string.length > 7
+                return "SN::invalid Incident number"
+            end
+            query_hash = {}
+            query_hash[:number] = "INC" + "0"*(7-inc_string.length) + inc_string
+            response = Configuration.get_resource(query_hash).get();
+            # returned hash
+            hash = JSON.parse(response, { :symbolize_names => true })
+            inc_obj = hash[:records][0]
+            # return the Incident object
+            inc_obj = Incident.new(inc_obj)
+            if inc_obj.attributes.nil?
+                "SN::No incident with incident number #{query_hash[:number]} found"
+            else
+                inc_obj
+            end
         end
     end
 end
