@@ -17,9 +17,9 @@ module ServiceNow
             "SN::Configuration successful"
         end
 
-        def self.get_resource(query_hash = {})
+        def self.get_resource(query_hash = {}, displayvalue = true)
             # to be filled in
-            RestClient::Resource.new(URI.escape($root_url + "/incident.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}"), $username, $password)
+            RestClient::Resource.new(URI.escape($root_url + "/incident.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}&displayvalue=#{displayvalue}"), $username, $password)
         end
 
         def self.post_resource
@@ -85,7 +85,7 @@ module ServiceNow
             return self
         end
 
-        def self.find(inc_number)
+        def self.find(inc_number, displayvalue = true)
             inc_string = inc_number.to_s.match(/[123456789]+\d*$/).to_s
             if inc_string.length > 7
                 return "SN::invalid Incident number"
@@ -105,7 +105,7 @@ module ServiceNow
             end
         end
 
-        def self.where(query_hash = {})
+        def self.where(query_hash = {}, displayvalue = true)
             response = Configuration.get_resource(query_hash).get();
             hash = JSON.parse(response, { :symbolize_names => true })
             array_of_records = hash[:records]
