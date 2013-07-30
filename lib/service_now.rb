@@ -17,21 +17,24 @@ module ServiceNow
             "SN::Success: Configuration successful"
         end
 
-        def self.get_resource(query_hash = {}, displayvalue = true, table)
+        def self.get_resource(query_hash = {}, displayvalue = false, table)
             # to be filled in
             RestClient::Resource.new(URI.escape($root_url + "/#{table}.do?JSON&sysparm_action=getRecords&sysparm_query=#{hash_to_query(query_hash)}&displayvalue=#{displayvalue}"), $username, $password)
         end
 
         def self.post_resource(table)
-            RestClient::Resource.new($root_url + "/#{table}.do?JSON&sysparm_action=insert", $username, $password)
+            RestClient::Resource.new(URI.escape($root_url + "/#{table}.do?JSON&sysparm_action=insert"), $username, $password)
         end
 
         def self.update_resource(incident_number, table)
-           RestClient::Resource.new($root_url + "/#{table}.do?JSON&sysparm_query=number=#{incident_number}&sysparm_action=update", $username, $password) 
+           RestClient::Resource.new(URI.escape($root_url + "/#{table}.do?JSON&sysparm_query=number=#{incident_number}&sysparm_action=update"), $username, $password) 
         end
 
         private
             def self.hash_to_query(query_hash = {})
+                if query_hash.empty?
+                    return ""
+                end
                 query_string = []
                 query_hash.each do |k, v|
                     query_string << k.to_s + "=" + v.to_s
@@ -50,8 +53,8 @@ module ServiceNow
             @attributes
         end
 
-        # buggy, could actually return incidents
         def self.find(netid)
+            User.check_configuration
             query_hash = {}
             query_hash[:user_name] = netid
             response = Configuration.get_resource(query_hash = query_hash, table = "sys_user").get()
@@ -66,6 +69,7 @@ module ServiceNow
         end
 
         def self.find_by_sys_id(sys_id)
+            User.check_configuration
             query_hash = {}
             query_hash[:sys_id] = sys_id
             response = Configuration.get_resource(query_hash = query_hash, table = "sys_user").get()
@@ -78,8 +82,8 @@ module ServiceNow
             end
         end
 
-        # buggy, could actually return incidents
         def self.find_by_name(name)
+            User.check_configuration
             query_hash = {}
             query_hash[:name] = name
             response = Configuration.get_resource(query_hash = query_hash, table = "sys_user").get()
@@ -96,13 +100,27 @@ module ServiceNow
             method_name = method.to_s
             @attributes[method_name.to_sym]
         end
+
+        private
+            def self.check_configuration
+                if $root_url.nil? || $username.nil? || $password.nil?
+                    raise "SN::Error: You have not configured yet, please run ServiceNow::Configuration.configure() first"
+                end
+            end
     end
 
     class Incident
 
+        def inspect
+            @attributes.each do |k, v|
+                puts "#{k} => #{v}"
+            end
+        end
+
         def initialize(attributes = {}, saved_on_sn = false, internal_call = false)
-            if $root_url.nil? || $username.nil? || $password.nil?
-                raise "SN::Error: You have not configured yet, please run ServiceNow::Configuration.configure() first"
+            Incident.check_configuration
+            if attributes.empty?
+                return nil
             end
             symbolized_attributes = Hash[attributes.map{|k, v| [k.to_sym, v]}]
             if !symbolized_attributes[:number].nil? && !internal_call
@@ -116,8 +134,8 @@ module ServiceNow
             @attributes
         end
 
-        def client # must be used only when displayvable is true
-            return User.find_by_name(self.caller_id)
+        def client # must be used only when displayvable is false
+            return User.find_by_sys_id(self.caller_id)
         end
 
         def method_missing(method, args = nil)
@@ -158,6 +176,7 @@ module ServiceNow
         end
 
         def self.find(inc_number)
+            Incident.check_configuration
             inc_string = inc_number.to_s.match(/[123456789]+\d*$/).to_s
             if inc_string.length > 7
                 raise "SN::Error: invalid Incident number"
@@ -177,6 +196,7 @@ module ServiceNow
         end
 
         def self.where(query_hash = {})
+            Incident.check_configuration
             response = Configuration.get_resource(query_hash, table = "incident").get();
             hash = JSON.parse(response, { :symbolize_names => true })
             array_of_records = hash[:records]
@@ -186,5 +206,12 @@ module ServiceNow
             end
             array_of_inc
         end
+
+        private
+            def self.check_configuration
+                if $root_url.nil? || $username.nil? || $password.nil?
+                    raise "SN::Error: You have not configured yet, please run ServiceNow::Configuration.configure() first"
+                end
+            end
     end
 end
