@@ -29,9 +29,9 @@ module ServiceNow
             method_name = method.to_s
             if match = method_name.match(/(.*)=/) # writer method
                 attribute = match[1]
-                # if attribute.eql? "number"
-                #     raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
-                # end
+                if attribute == "number" && @saved_on_sn
+                    raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
+                end
                 @attributes[attribute.to_sym] = args
             else # reader method
                 @attributes[method_name.to_sym]
@@ -39,6 +39,8 @@ module ServiceNow
         end
 
         def save!
+            # if this is a new incident (still in memory and not on SN), and the user set the Incident number
+            # we raise an exception
             if !@attributes[:number].nil? && !@saved_on_sn
                 raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
             end
