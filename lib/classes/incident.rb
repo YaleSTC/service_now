@@ -29,9 +29,9 @@ module ServiceNow
             method_name = method.to_s
             if match = method_name.match(/(.*)=/) # writer method
                 attribute = match[1]
-                if attribute.eql? "number"
-                    raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
-                end
+                # if attribute.eql? "number"
+                #     raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
+                # end
                 @attributes[attribute.to_sym] = args
             else # reader method
                 @attributes[method_name.to_sym]
@@ -39,12 +39,15 @@ module ServiceNow
         end
 
         def save!
+            if !@attributes[:number].nil? && !@saved_on_sn
+                raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
+            end
             # we only create new incidents if it's not saved already
             if !@saved_on_sn
-                response = Configuration.post_resource.post(self.attributes.to_json, table = "incident")
+                response = Configuration.post_resource(table = "incident").post(self.attributes.to_json)
                 @saved_on_sn = true
             else
-                response = Configuration.update_resource(self.number).post(self.attributes.to_json, table = "incident")
+                response = Configuration.update_resource(self.number, table = "incident").post(self.attributes.to_json)
                 # debug
                 puts response
                 # even though we know it's saved already, just set it again to be sure
