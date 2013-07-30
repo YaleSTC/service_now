@@ -9,9 +9,6 @@ module ServiceNow
 
         def initialize(attributes = {}, saved_on_sn = false, internal_call = false)
             Incident.check_configuration
-            if attributes.empty?
-                return nil
-            end
             symbolized_attributes = Hash[attributes.map{|k, v| [k.to_sym, v]}]
             if !symbolized_attributes[:number].nil? && !internal_call # allow setting INC number if it's called internally
                 raise "SN::ERROR: You are not allowed to set INC Number manually, the server will take care of that"
@@ -44,10 +41,10 @@ module ServiceNow
         def save!
             # we only create new incidents if it's not saved already
             if !@saved_on_sn
-                response = Configuration.post_resource.post(self.attributes.to_json)
+                response = Configuration.post_resource.post(self.attributes.to_json, table = "incident")
                 @saved_on_sn = true
             else
-                response = Configuration.update_resource(self.number).post(self.attributes.to_json)
+                response = Configuration.update_resource(self.number).post(self.attributes.to_json, table = "incident")
                 # debug
                 puts response
                 # even though we know it's saved already, just set it again to be sure

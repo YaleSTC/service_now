@@ -28,7 +28,15 @@ module ServiceNow
                 end
                 query_string = []
                 query_hash.each do |k, v|
-                    query_string << k.to_s + "=" + v.to_s
+                    key_str = k.to_s
+                    value_str = v.to_s
+                    # if we are querying based on short_description or description
+                    # we use a partial match
+                    if key_str == "short_description" || key_str == "description"
+                        query_string << key_str + "LIKE" + value_str
+                    else
+                        query_string << key_str + "=" + value_str
+                    end
                 end
                 query_string.join('^')
             end
