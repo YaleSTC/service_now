@@ -47,13 +47,8 @@ module ServiceNow
             # we only create new incidents if it's not saved already
             if !@saved_on_sn
                 response = Configuration.post_resource(table = "incident").post(self.attributes.to_json)
-                @saved_on_sn = true
             else
                 response = Configuration.update_resource(self.number, table = "incident").post(self.attributes.to_json)
-                # debug
-                puts response
-                # even though we know it's saved already, just set it again to be sure
-                @saved_on_sn = true
             end
             hash = JSON.parse(response, { :symbolize_names => true })
             # this is the object
@@ -64,6 +59,7 @@ module ServiceNow
                 key_name = key.to_s
                 eval("self.#{key_name} = value")
             end
+            @saved_on_sn = true
             self
         end
 
