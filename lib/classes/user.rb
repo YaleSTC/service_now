@@ -18,7 +18,8 @@ module ServiceNow
             # there should be only one
             user = User.new(hash[:records][0])
             if user.attributes.nil?
-                "SN::Alert: No user with netID: #{netid} found"
+                puts "SN::Alert: No user with netID: #{netid} found"
+                return User.new
             else
                 user
             end
@@ -32,7 +33,8 @@ module ServiceNow
             hash = JSON.parse(response, { :symbolize_names => true })
             user = User.new(hash[:records][0])
             if user.attributes.nil?
-                "SN::Alert: No user with sys_id: #{sys_id} found"
+                puts "SN::Alert: No user with sys_id: #{sys_id} found"
+                return User.new
             else
                 user
             end
@@ -46,7 +48,8 @@ module ServiceNow
             hash = JSON.parse(response, { :symbolize_names => true })
             user = User.new(hash[:records][0])
             if user.attributes.nil?
-                "SN::Alert: No user with user_name: #{name} found"
+                puts "SN::Alert: No user with user_name: #{name} found"
+                return User.new
             else
                 user
             end
