@@ -1,21 +1,14 @@
 require "service_now/version"
+require "classes/configuration"
+require "classes/incident"
+require "classes/user"
+require "rest_client"
+require "json"
+require "uri"
+
 
 module ServiceNow
-    
-    class Incident
-
-        def initialize(attributes = {})
-            @attributes = attributes
-        end
- 
-        def method_missing(method, args = nil)
-            method_name = method.to_s
-            if match = method_name.match(/(.*)=/) # writer method
-                attribute = match[1]
-                @attributes[attribute] = args
-            else # reader method
-                @attributes[method_name]
-            end
-        end
-    end
+    $root_url = nil
+    $username = nil
+    $password = nil
 end
