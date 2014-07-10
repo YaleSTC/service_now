@@ -1,6 +1,6 @@
 # ServiceNow
 
-TODO: Write a gem description
+This Gem uses [Service Now's REST Api](http://wiki.servicenow.com/index.php?title=REST_API). It has only been used with reading & creating incidents so far.
 
 ## Installation
 
