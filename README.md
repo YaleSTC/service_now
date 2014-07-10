@@ -39,6 +39,9 @@ def create_incident(params)
 end
 ```
 
+### Specifications
+For details on the planned usage of this gem which may or may not be implemented yet, see [specs.md](specs.md).
+
 ## Contributing
 
 1. Fork it
