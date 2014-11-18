@@ -57,8 +57,10 @@ end
 
 Setting `inc.u_kb_article` will set the KB Article field, but it will not apply the associated template.
 
-### Specifications
-For details on the planned usage of this gem which may or may not be implemented yet, see [specs.md](specs.md).
+### More Features
+
+More features of this gem are documented in the specifications file. These may or may not be implemented yet, see [specs.md](specs.md).
+You can also check the source files in `/lib`.
 
 ## Contributing
 
