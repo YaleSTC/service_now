@@ -18,6 +18,16 @@ Or install it yourself as:
 
 ## Usage
 
+###Finding an Incident
+```ruby
+  ServiceNow::Configuration.configure(:sn_url => ENV['SN_INSTANCE'], :sn_username => ENV['SN_USERNAME'], :sn_password => ENV['SN_PASSWORD'])
+  inc_number = "INC1234567"
+  inc = ServiceNow::Incident.find(inc_number)
+```
+
+`inc` will contain a hash of attributes retrieved from Service Now for that incident.
+
+
 ###Creating an Incident
 ```ruby
 params = {
