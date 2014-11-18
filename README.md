@@ -21,7 +21,7 @@ Or install it yourself as:
 ###Finding an Incident
 ```ruby
   ServiceNow::Configuration.configure(:sn_url => ENV['SN_INSTANCE'], :sn_username => ENV['SN_USERNAME'], :sn_password => ENV['SN_PASSWORD'])
-  inc_number = "INC1234567"
+  inc_number = "INC0000567"
   inc = ServiceNow::Incident.find(inc_number)
 ```
 
